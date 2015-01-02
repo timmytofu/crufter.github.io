@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Everyday hassles in Go </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2014-12-01T00:00:00+00:00" itemprop="datePublished">
+          01 December 2014
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Everyday hassles in Go</h1>
+    <div itemprop="articleBody">
+      <p>The following article is not finished yet. The article might interest people who are familiar with Go and who are curious how functional languages solve certain problem Go has.</p>
+
+<p>Go became a reliable, if a bit simple minded friend of mine during the past years. I use it in my day job and for side projects alike. Despite using (and liking*) it a lot, I have to admit the language could be improved a lot by borrowing battletested ideas from more modern languages. Unfortunately, a lot of Go programmers are coming from untyped languages, which means they haven’t yet acquired the taste for sufficiently expressive type systems, thus they may not even know that there is a better way to things. A snarky person might say, they suffer from the <a href="http://www.paulgraham.com/avg.html">blub paradox</a>.</p>
+
+<p>This lack of perspective in the Go community further hinders the progress of the language - people do not exert enough force toward the authors (not like they seem to be crowd pleasers anyway) to better the language. While I am grateful for Go as a tool, I am slightly worried about it’s potential educational effect - or the lack of it. Given it is backed by Google - due to the hype and exposure that brings - even design failures will be accepted as ‘the way to do it’ by a large number of people. People like the authors of Go has an immense responsibility when it comes to improving our industry as a whole.</p>
+
+<p>To show the limitations of some of the archaic concepts present in Go - here are the analysis if some of the features (or the lack of them) I consider unfortunate, with use cases and accompanying code. Some of these will be highly subjective, and the examples may be quiet arbitrary. Most of the difficulties listed here could be fixed by a relatively small number of changes (<a href="http://en.wikipedia.org/wiki/Pareto_principle">the 80/20 rule?</a>).</p>
+
+<p>*Mostly due to the amazingly comprehensive standard library. For such a young language anyway. The documentation is also brilliant.</p>
+
+<h3 id="lack-of-generics">Lack of generics</h3>
+
+<p>Generics are well supported by a wide range of languages, and is one of the most requested lacking features of Go. The usual response from the Go authors is that implementing generics will either slow down compilation, the code, or the programmer. While that is almost a believable reason, the funnier part of their reasoning is (excerpt from FAQ):</p>
+
+<blockquote>
+  <p>Go’s built-in maps and slices, plus the ability to use the empty interface to construct containers (with explicit unboxing) mean in many cases it is possible to write code that does what generics would enable, if less smoothly.</p>
+</blockquote>
+
+<p>(<a href="https://golang.org/doc/faq#generics">link<a>)</a></a></p>
+
+<p>Well, how less smoothly is not stated, but I would argue even minor annoyances can grow weary if encountered frequently enough. And even these seemingly minor annoyances can se.</p>
+
+<h4 id="flow-distruption">Flow distruption</h4>
+
+<p>Perhaps the most elusive, but rather destructive aspect of the lack of generics in Go is how the language forces the user to go into uninteresting details while expressing ideas, distrupting the programmer’s flow. Those who never used generics might not notice this, so here are some quite arbitrary examples:</p>
+
+<p>(Quiet a good chunk of this blog post will be dedicated to help people who never used generics to develop an intuition why generics are useful. If you are not interested in this part, scroll down a bit.)</p>
+
+<h5 id="deduping-slice-elements">Deduping slice elements</h5>
+
+<p>Let’s take a ratherDeduping elements of a slice happens the following way in go:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;fmt&quot;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="c1">// Given the following list:</span>
+	<span class="nx">xs</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">}</span>
+	
+	<span class="c1">// For loop is the only generic way to traverse slices, you we have to write the following:</span>
+	<span class="nx">index</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+		<span class="nx">index</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">=</span> <span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="p">}</span>
+	
+	<span class="c1">// We can &quot;easily&quot; acquire the deduped slice by using a for loop again...</span>
+	<span class="nx">deduped</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}</span>
+	<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">index</span> <span class="p">{</span>
+		<span class="nx">deduped</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">deduped</span><span class="p">,</span> <span class="nx">k</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="c1">// Hooray, we can use the &#39;deduped&#39; slice!</span>
+	<span class="nx">fmt</span><span class="p">.</span><span class="nx">Println</span><span class="p">(</span><span class="nx">deduped</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+
+<p>(<a href="http://play.golang.org/p/Mo_ZfbJNJF">playground link</a>)</p>
+
+<p>For those who are not familiar with the concept of generics, here is a though experiment: let’s refactor that bit of information by moving it out to a function:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kd">func</span> <span class="nx">deduper</span><span class="p">(</span><span class="nx">xs</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+	<span class="nx">index</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">int</span><span class="p">]</span><span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+		<span class="nx">index</span><span class="p">[</span><span class="nx">x</span><span class="p">]</span> <span class="p">=</span> <span class="kd">struct</span><span class="p">{}{}</span>
+	<span class="p">}</span>
+	<span class="nx">deduped</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}</span>
+	<span class="k">for</span> <span class="nx">k</span><span class="p">,</span> <span class="nx">_</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">index</span> <span class="p">{</span>
+		<span class="nx">deduped</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">deduped</span><span class="p">,</span> <span class="nx">k</span><span class="p">)</span>
+	<span class="p">}</span>
+	<span class="k">return</span> <span class="nx">deduped</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Uh-oh: now our method only works on maps - our for loops would be still generic, but the function definition forces us to tell the type of the input argument. It is an int slice. If somehow we could tell the compiler that we don’t care what kind of slice it is!</p>
+
+<p>You may ask - what if we use the interface{} interface type? It is a bit ugly, but it works! Let’s try that!</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">deduper</span><span class="p">(</span><span class="nx">xs</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{})</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{}</span> <span class="p">{</span>
+	<span class="nx">index</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">int</span></code></pre></div>
+
+<p>Uh-oh again. We even had to stop typing. We can not use the empty interface as our key in the map… To be able to use something as a map key the members of that type must be comparable (<a href="http://golang.org/ref/spec#Comparison_operators">http://golang.org/ref/spec#Comparison_operators</a>). Empty interfaces are not comparable, since they can represent non-comparable types! This way we can forgot our neat implementating which reuses the idempotent nature of setting keys of a map!</p>
+
+<p>Let’s look for an other approach - surely the Go authors have paved the way for us. Let’s take a look at the <a href="http://golang.org/pkg/sort/">sort package</a>. We see a quite descriptively named <a href="http://golang.org/pkg/sort/#Interface">sort.Interface</a> type there:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Interface</span> <span class="kd">interface</span> <span class="p">{</span>
+        <span class="c1">// Len is the number of elements in the collection.</span>
+        <span class="nx">Len</span><span class="p">()</span> <span class="kt">int</span>
+        <span class="c1">// Less reports whether the element with</span>
+        <span class="c1">// index i should sort before the element with index j.</span>
+        <span class="nx">Less</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span>
+        <span class="c1">// Swap swaps the elements with indexes i and j.</span>
+        <span class="nx">Swap</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+
+<p>This would be all good, but no methods can be defined on builtin types! Don’t worry! The <a href="http://golang.org/pkg/sort/#IntSlice">IntSlice</a> type comes for the rescue! We only have to typecast our []int into an IntSlice and we can use all the functions written by other very smart people. But let’s go back to the deduping function. Let’s try to use the sort.Interface to write our own deduping function. After all, we can compare elements of a slice with it.</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;sort&quot;</span>
+
+<span class="kd">func</span> <span class="nx">dedupe</span><span class="p">(</span><span class="nx">xs</span> <span class="nx">sort</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+	
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>(<a href="http://play.golang.org/p/grnXYt76pE">playground link</a>)</p>
+
+<p>Before finishing our function we realize one thing - we can not iterate over the sort.Interface:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">prog</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span> <span class="kd">type</span> <span class="nx">sort</span><span class="p">.</span><span class="nx">Interface</span> <span class="nx">is</span> <span class="nx">not</span> <span class="nx">an</span> <span class="nx">expression</span>
+<span class="nx">prog</span><span class="p">.</span><span class="k">go</span><span class="p">:</span><span class="mi">7</span><span class="p">:</span> <span class="nx">cannot</span> <span class="k">range</span> <span class="nx">over</span> <span class="nx">xs</span> <span class="p">(</span><span class="kd">type</span> <span class="nx">sort</span><span class="p">.</span><span class="nx">Interface</span><span class="p">)</span>
+ <span class="p">[</span><span class="nx">process</span> <span class="nx">exited</span> <span class="nx">with</span> <span class="nx">non</span><span class="o">-</span><span class="nx">zero</span> <span class="nx">status</span><span class="p">]</span></code></pre></div>
+
+<p>The main problem here is that we’ve lost information - the sort.Interface is not a slice anymore. We’ve lost the ability to iterate over it the moment we created an interface out of it - which was not our intention at all. We only had to do that due to Go’s inability to express concepts in a generic way. Interfaces are very one dimensional. We can not build on top of them. In an expressive language, like haskell’s, we can say: “given a type ‘a’ which elements can be compared against each other to see if they are equivalent, we can write a function which removes duplicates from a list (slice) of these elements”.</p>
+
+<p>That function, in the Haskell standard library, is Data.List.nub:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">import</span> <span class="nn">Data.List</span>
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">nub</span>
+<span class="nf">nub</span> <span class="ow">::</span> <span class="kt">Eq</span> <span class="n">a</span> <span class="ow">=&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">nub</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">nub</span> <span class="p">[</span><span class="n">&#39;a&#39;</span><span class="p">,</span> <span class="n">&#39;b&#39;</span><span class="p">,</span> <span class="n">&#39;a&#39;</span><span class="p">,</span> <span class="n">&#39;c&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="n">&#39;a&#39;</span><span class="p">,</span> <span class="n">&#39;b&#39;</span><span class="p">,</span> <span class="n">&#39;c&#39;</span><span class="p">]</span></code></pre></div>
+
+<p>The above snippets illustrates how nub works with a list of anything, as long as anything is an instance of the Eq typeclass - ie. there is a defined way to compare them on grounds of equality.</p>
+
+<p>For those who are bothered about the exponential algorithmic complexity of nub, let’s recreate our efficient (albeit nongeneric) Go solution in Haskell.</p>
+
+<p>Nub requires the elements of the list to be instances of the Eq typeclass, that is why it performs soo poorly. If we are stricter and require the elements to be instances of Ord typclass, as is the case with Go’s maps indices, we can write a more efficient function, which pretty much does the same thing as the Go code snippet above - puts the list elements to a map and then converts back to a list:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="kr">import</span> <span class="k">qualified</span> <span class="nn">Data.Map</span> <span class="k">as</span> <span class="n">M</span>
+<span class="kr">let</span> <span class="n">nubWell</span> <span class="n">xs</span> <span class="ow">=</span> <span class="n">map</span> <span class="p">(</span><span class="nf">\</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="kr">_</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="n">k</span><span class="p">)</span> <span class="o">.</span> <span class="kt">M</span><span class="o">.</span><span class="n">toList</span> <span class="o">.</span> <span class="kt">M</span><span class="o">.</span><span class="n">fromList</span> <span class="o">$</span> <span class="n">map</span> <span class="p">(</span><span class="nf">\</span><span class="n">x</span> <span class="ow">-&gt;</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">()</span><span class="p">))</span> <span class="n">xs</span>
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">nubWell</span>
+<span class="nf">nubWell</span> <span class="ow">::</span> <span class="kt">Ord</span> <span class="n">b</span> <span class="ow">=&gt;</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">nubWell</span> <span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">]</span></code></pre></div>
+
+<p>Just to show you that it actually works on any instance of the Ord typeclass, let’s nub a list of strings:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="n">nubWell</span> <span class="p">[</span><span class="s">&quot;generics&quot;</span><span class="p">,</span> <span class="s">&quot;are&quot;</span><span class="p">,</span> <span class="s">&quot;useful&quot;</span><span class="p">,</span> <span class="s">&quot;useful&quot;</span><span class="p">,</span> <span class="s">&quot;it&quot;</span><span class="p">,</span> <span class="s">&quot;is&quot;</span><span class="p">,</span> <span class="s">&quot;a&quot;</span><span class="p">,</span> <span class="s">&quot;useful&quot;</span><span class="p">,</span> <span class="s">&quot;fact&quot;</span><span class="p">]</span>
+<span class="p">[</span><span class="s">&quot;a&quot;</span><span class="p">,</span><span class="s">&quot;are&quot;</span><span class="p">,</span><span class="s">&quot;fact&quot;</span><span class="p">,</span><span class="s">&quot;generics&quot;</span><span class="p">,</span><span class="s">&quot;is&quot;</span><span class="p">,</span><span class="s">&quot;it&quot;</span><span class="p">,</span><span class="s">&quot;useful&quot;</span><span class="p">]</span></code></pre></div>
+
+<p>Please note that our version of nub is not order preserving - neither is the Go version due to the randomized traversal of maps. </p>
+
+<p><a href="https://groups.google.com/forum/#!topic/golang-nuts/-pqkICuokio">This thread</a> discusses the same problem, without finding a nice solution - because there isn’t any - the type system is just not expressive enough.</p>
+
+<h5 id="standard-list-operations">Standard list operations</h5>
+
+<p>In go we are forced to use iteration as our tool to traverse slices and maps - because iteration is polymorphic builtin construct. The verbosity of iteration is mind-bogging, combined with appending, ifs and other constructs makes the code way more involved than it should be.</p>
+
+<p>Let’s observe a scenario when we want to remove elements from a slice:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">xs</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">}</span>
+
+<span class="c1">// Remove elements smaller than 4</span>
+<span class="nx">smallerThanFour</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}</span>
+<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">x</span> <span class="p">&lt;</span> <span class="mi">4</span> <span class="p">{</span>
+		<span class="nx">smallerThanFour</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">smallerThanFour</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>(<a href="http://play.golang.org/p/JU-yUKTEZS">playground link</a>)</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">let</span> <span class="n">xs</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">6</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">filter</span> <span class="p">(</span><span class="o">&lt;</span><span class="mi">4</span><span class="p">)</span> <span class="n">xs</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span></code></pre></div>
+
+<p>Or if we want to remove an element from a slice</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">xs</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">}</span>
+<span class="nx">noFiveHere</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}</span>
+<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">x</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xs</span> <span class="p">{</span>
+	<span class="k">if</span> <span class="nx">x</span> <span class="o">!=</span> <span class="mi">5</span> <span class="p">{</span>
+		<span class="nx">noFiveHere</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">noFiveHere</span><span class="p">,</span> <span class="nx">x</span><span class="p">)</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">let</span> <span class="n">xs</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">6</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">filter</span> <span class="p">(</span><span class="o">/=</span><span class="mi">5</span><span class="p">)</span> <span class="n">xs</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span></code></pre></div>
+
+<p>These operations would be possible in Go with the help of generics… although the type signature of the lambda would have to be stated explicitly, since Go <a href="http://programmers.stackexchange.com/questions/253558/type-inference-in-golang-haskell">does not support type inference</a> (not the rather powerful Hindler-Milner anyway).</p>
+
+<h4 id="empty-interfaces-everywhere">Empty interfaces everywhere</h4>
+
+<p>Without generics support, it is impossible to create a generic type parametrized over an other one. It is especially painful when dealing with container-like types, sets, trees etc. </p>
+
+<p>The type signature becomes littered with interface{}-s, decreasing the readabilty and the type safety of the language.</p>
+
+<p>Take a look at the following package: <a href="http://golang.org/pkg/container/list">The conatiner/list package in the standard library</a></p>
+
+<p>The type signature of the List type is the following:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">List</span>
+    <span class="kd">func</span> <span class="nx">New</span><span class="p">()</span> <span class="o">*</span><span class="nx">List</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">Back</span><span class="p">()</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">Front</span><span class="p">()</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">Init</span><span class="p">()</span> <span class="o">*</span><span class="nx">List</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">InsertAfter</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">mark</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">InsertBefore</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{},</span> <span class="nx">mark</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">Len</span><span class="p">()</span> <span class="kt">int</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">MoveAfter</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">mark</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">MoveBefore</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">mark</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">MoveToBack</span><span class="p">(</span><span class="nx">e</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">MoveToFront</span><span class="p">(</span><span class="nx">e</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">PushBack</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">PushBackList</span><span class="p">(</span><span class="nx">other</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">PushFront</span><span class="p">(</span><span class="nx">v</span> <span class="kd">interface</span><span class="p">{})</span> <span class="o">*</span><span class="nx">Element</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">PushFrontList</span><span class="p">(</span><span class="nx">other</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span>
+    <span class="kd">func</span> <span class="p">(</span><span class="nx">l</span> <span class="o">*</span><span class="nx">List</span><span class="p">)</span> <span class="nx">Remove</span><span class="p">(</span><span class="nx">e</span> <span class="o">*</span><span class="nx">Element</span><span class="p">)</span> <span class="kd">interface</span><span class="p">{}</span></code></pre></div>
+
+<p>All the functions that are dealing with the elements of the List are defined with empty interfaces. That could be completely avoided if the List type could be parametrized over other types (like the builtin types map and slice can be. If you want to read more about these types, which seem to require other types to produce a ‘final type’, start <a href="http://en.wikipedia.org/wiki/Kind_%28type_theory%29">here<a>).</a></a></p>
+
+<h3 id="lack-of-algebraic-data-types">Lack of algebraic data types</h3>
+
+<p><a href="http://en.wikipedia.org/wiki/Tagged_union">Algebraic data types</a>, or sum types are basically types which can represent a certain number of fixed types.</p>
+
+<p>So while in a struct the different fields are present in the same type, an ADT may contain only one of those fields at a time. An example would be:</p>
+
+<h4 id="nondescriptive-types">Nondescriptive types</h4>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="kr">data</span> <span class="kt">Tree</span> <span class="ow">=</span> <span class="kt">Leaf</span>
+          <span class="o">|</span> <span class="kt">Node</span> <span class="kt">Int</span> <span class="kt">Tree</span> <span class="kt">Tree</span></code></pre></div>
+
+<p>The same concept in Go would be expressed as:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">Tree</span> <span class="kd">struct</span> <span class="p">{</span>
+	<span class="nx">Int</span> <span class="kt">int</span>
+	<span class="nx">Left</span> <span class="o">*</span><span class="nx">Tree</span>
+	<span class="nx">Right</span> <span class="o">*</span><span class="nx">Tree</span>
+	<span class="nx">Leaf</span> <span class="o">*</span><span class="nx">Leaf</span>
+<span class="p">}</span></code></pre></div>
+
+<p>All the possible values would be present at all times - even if they are not being used at all. This gets messy quiet quickly.</p>
+
+<h4 id="a-rainbow-of-grey-grey-and-grey">A rainbow of grey, grey, and grey</h4>
+
+<p>Apart from readability, type safety suffers as well. The moment we need something to be able to hold more than one type, suddenly it becomes</p>
+
+<h4 id="multiple-return-values">Multiple return values</h4>
+
+<p>Multiple return values are really just a special case of <a href="http://en.wikipedia.org/wiki/Tuple">tuples</a>, except they are much less composable. One might argue, they are intentionally hard to compose, so it makes ignoring returned errors harder. However that would be a pretty bad argument. Let’s examine the following code snippet:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kn">package</span> <span class="nx">main</span>
+
+<span class="kn">import</span> <span class="s">&quot;os&quot;</span>
+
+<span class="kd">func</span> <span class="nx">main</span><span class="p">()</span> <span class="p">{</span>
+	<span class="nx">file</span><span class="p">,</span> <span class="nx">err</span> <span class="p">=</span> <span class="nx">os</span><span class="p">.</span><span class="nx">Open</span><span class="p">(</span><span class="s">&quot;file.txt&quot;</span><span class="p">)</span>
+	<span class="k">if</span> <span class="nx">err</span> <span class="o">==</span> <span class="kc">nil</span> <span class="p">{</span>
+		<span class="k">return</span>
+	<span class="p">}</span>
+	<span class="nx">file</span><span class="p">.</span><span class="nx">Chmod</span><span class="p">(</span><span class="mi">777</span><span class="p">)</span>
+<span class="p">}</span></code></pre></div>
+
+<p>(<a href="http://play.golang.org/p/oVGfd-e2w1">playground link</a>)</p>
+
+<p>The compiler happily accepts this while this is clearly a bug. Tools like Go vet may catch the errors - however - that is just band aid. Guaranteeing code correctess is the job of the compiler, a tool like Go vet may utilize ad hoc solutions to detect certain specific problems with the code but that solution will never be as coherent and all encompassing as a sufficiently expressive type system can be.</p>
+
+<p>With the help of ADTs (and pattern matching) this problem can be easily detected (more on this later).</p>
+
+<h3 id="interfaces-are-misdesigned">Interfaces are misdesigned</h3>
+
+<h4 id="interfaces-are-implemented-implicitlyno-way-to-define-how-a-foreign-type-implements-an-interface">Interfaces are implemented implicitly/no way to define how a foreign type implements an interface</h4>
+
+<p>Interfaces in Go are implemented implicitly, which means if someone happens to come along and creates an interface with a method which your type already has your type immediately implements that interface - wether you like it or not. While this happens rather rarely in practice (in my experience), a consequence of this is much more severe -</p>
+
+<p>I do not understand the motivation behind this design decision - usually Go prefers explicitness over implicitness, why the exception here? When writing a methods which is implementing an interface one has a specific interface in mind anyway - then why lose this information?</p>
+
+<p>The biggest reason why go had to abandon the very concept of defining methods on foreign types is because interfaces are implemented implicitly. It saves a bit of typing in the short term but has utterly devastating consequences in the long term: one has to created new named type</p>
+
+<p>Interestingly, Go already has syntax which would be well suited to this (not like syntax is an important matter when it comes to issues like this), as it is noted in <a href="https://groups.google.com/forum/#!topic/golang-nuts/Hbxekd9g09c">this thread</a> by Rasmus Schultz.</p>
+
+<blockquote>
+  <p>I was under the impression that one of the key reasons for the “detached” method-declaration syntax, was that you would be able to extend somebody else’s type with new methods required by your program, in a “non-invasive” manner.</p>
+</blockquote>
+
+<h4 id="lack-of-deriving">Lack of deriving</h4>
+
+<p>Default implementations for certain interfaces should be provided. How can Go print out our structs or maps currectly? We don’t know. It is done with reflection, which is runtime concept and sidesteps the type system entirely. The ad hoc, edge case laden nature of Go shows here again. For those who are unfamiliar with the concept.</p>
+
+<p>If we define a record (struct in Go land), and we want to print an instance of it, we get a compile error.</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">data</span> <span class="kt">Customer</span> <span class="ow">=</span> <span class="kt">Customer</span> <span class="p">{</span> <span class="n">name</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">age</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="p">}</span>
+<span class="o">&gt;</span> <span class="n">print</span> <span class="o">$</span> <span class="kt">Customer</span> <span class="s">&quot;Joe&quot;</span> <span class="mi">14</span>
+
+<span class="o">&lt;</span><span class="n">interactive</span><span class="o">&gt;:</span><span class="mi">3</span><span class="kt">:</span><span class="mi">1</span><span class="kt">:</span>
+    <span class="kt">No</span> <span class="kr">instance</span> <span class="n">for</span> <span class="p">(</span><span class="kt">Show</span> <span class="kt">Customer</span><span class="p">)</span> <span class="n">arising</span> <span class="n">from</span> <span class="n">a</span> <span class="n">use</span> <span class="kr">of</span> <span class="err">‘</span><span class="n">print</span><span class="err">’</span>
+    <span class="kt">In</span> <span class="n">the</span> <span class="n">expression</span><span class="kt">:</span> <span class="n">print</span>
+    <span class="kt">In</span> <span class="n">the</span> <span class="n">expression</span><span class="kt">:</span> <span class="n">print</span> <span class="o">$</span> <span class="kt">Customer</span> <span class="s">&quot;Joe&quot;</span> <span class="mi">14</span>
+    <span class="kt">In</span> <span class="n">an</span> <span class="n">equation</span> <span class="n">for</span> <span class="err">‘</span><span class="n">it</span><span class="err">’</span><span class="kt">:</span> <span class="n">it</span> <span class="ow">=</span> <span class="n">print</span> <span class="o">$</span> <span class="kt">Customer</span> <span class="s">&quot;Joe&quot;</span> <span class="mi">14</span></code></pre></div>
+
+<p>The compiler error tells us that our Customer type is not an instance of the Show typeclass - in Go terminology, the Customer type does not implement the Show interface. Inspecting the type signature of print we see it indeed requires any element passed to it to be an instance of Show:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span>
+<span class="nf">print</span> <span class="ow">::</span> <span class="kt">Show</span> <span class="n">a</span> <span class="ow">=&gt;</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">IO</span> <span class="nb">()</span></code></pre></div>
+
+<p>Using derive, we can get default implementations for free:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">data</span> <span class="kt">Customer</span> <span class="ow">=</span> <span class="kt">Customer</span> <span class="p">{</span> <span class="n">name</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">age</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="p">}</span> <span class="kr">deriving</span> <span class="kt">Show</span>
+<span class="o">&gt;</span> <span class="n">print</span> <span class="o">$</span> <span class="kt">Customer</span> <span class="s">&quot;Joe&quot;</span> <span class="mi">14</span>
+<span class="kt">Customer</span> <span class="p">{</span><span class="n">name</span> <span class="ow">=</span> <span class="s">&quot;Joe&quot;</span><span class="p">,</span> <span class="n">age</span> <span class="ow">=</span> <span class="mi">14</span><span class="p">}</span></code></pre></div>
+
+<p>Also interesting how our Customer type ‘officially’ became an instance of the Show typeclass:</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="kt">Prelude</span><span class="o">&gt;</span> <span class="kt">:</span><span class="n">i</span> <span class="kt">Customer</span>
+<span class="kr">data</span> <span class="kt">Customer</span> <span class="ow">=</span> <span class="kt">Customer</span> <span class="p">{</span><span class="n">name</span> <span class="ow">::</span> <span class="kt">String</span><span class="p">,</span> <span class="n">age</span> <span class="ow">::</span> <span class="kt">Int</span><span class="p">}</span>
+  	<span class="c1">-- Defined at &lt;interactive&gt;:7:1</span>
+<span class="kr">instance</span> <span class="kt">Show</span> <span class="kt">Customer</span> <span class="c1">-- Defined at &lt;interactive&gt;:7:66</span></code></pre></div>
+
+<p>So from the point of view of the the type system, </p>
+
+<h4 id="type-assertions">Type assertions</h4>
+
+<p>Type assertions are completely type unsafe - a function should never ever make assumptions about the underlying type of an interface type - that completely defies the purpose of interfaces to begin with.</p>
+
+<h3 id="other-minor-annoyances">Other minor annoyances</h3>
+
+<h4 id="general-inelegance">General inelegance</h4>
+
+<p>The obsession with operators (why can’t they be functions?).</p>
+
+<h4 id="no-type-aliases">No type aliases</h4>
+
+<p>Sometimes it is good to have type aliases which are basically macros doing simple string replace in the source, to increase readability, for example the excellent MongoDB driver, <a href="https://github.com/go-mgo/mgo">mgo</a> defines a convenience type M:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">type</span> <span class="nx">M</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{}</span></code></pre></div>
+
+<p>This is just to avoid typing map[string]interface{} when defining BSON documents. Compare:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">customer</span> <span class="o">:=</span> <span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{</span>
+	<span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;42&quot;</span>
+	<span class="s">&quot;cats&quot;</span><span class="p">:</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{</span>
+		<span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{</span>
+			<span class="s">&quot;Name&quot;</span><span class="p">:</span> <span class="s">&quot;Joe&quot;</span><span class="p">,</span>
+			<span class="s">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="kd">map</span><span class="p">[</span><span class="kt">string</span><span class="p">]</span><span class="kd">interface</span><span class="p">{</span>
+			<span class="s">&quot;Name&quot;</span><span class="p">:</span> <span class="s">&quot;Joline&quot;</span><span class="p">,</span>
+			<span class="s">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>vs:</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="nx">customer</span> <span class="o">:=</span> <span class="nx">M</span><span class="p">{</span>
+	<span class="s">&quot;id&quot;</span><span class="p">:</span> <span class="s">&quot;42&quot;</span>
+	<span class="s">&quot;cats&quot;</span><span class="p">:</span> <span class="p">[]</span><span class="kd">interface</span><span class="p">{</span>
+		<span class="nx">M</span><span class="p">{</span>
+			<span class="s">&quot;Name&quot;</span><span class="p">:</span> <span class="s">&quot;Joe&quot;</span><span class="p">,</span>
+			<span class="s">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+		<span class="p">},</span>
+		<span class="nx">M</span><span class="p">{</span>
+			<span class="s">&quot;Name&quot;</span><span class="p">:</span> <span class="s">&quot;Joline&quot;</span><span class="p">,</span>
+			<span class="s">&quot;Age&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+		<span class="p">}</span>
+	<span class="p">}</span>
+<span class="p">}</span></code></pre></div>
+
+<p>Unfortunately, in Go, M and map[string]interface{} become completely separate types - we have to typecast from one type to satisfy the compiler.</p>
+
+<h3 id="conclusion">Conclusion</h3>
+
+<p>To be finished.</p>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+    
+      <a rel="prev" href="/2013/04/10/haskell-tutorial-thinking-recursively/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

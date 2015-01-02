@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell - Practical Advantages </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-03-31T00:00:00+00:00" itemprop="datePublished">
+          31 March 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell - Practical Advantages</h1>
+    <div itemprop="articleBody">
+      <p>
+    There are more than a couple of meatless posts on the net about how the magical (not at all) functional programming paradigm is entirely different (no it isn't)
+    from everything you are used to, and how will it save the world (no it won't).
+</p>
+
+<p>
+    So let's try to approach Haskell, which is the <a href="http://stackoverflow.com/a/809983/441291">800-pound gorilla</a> in FP (functional programming) land, from a practical
+    angle, without empty buzzwords. If you think that this article also lacks meat, well, you are wrong because I am right, but nevertheless slap me in the face.
+</p>
+
+<p>
+    I will intentionally remain in shallow waters to be easily digestible by the broadest possible audience.
+</p>
+
+<h3>Static type system with type inference</h3>
+
+<p>
+    Most programmers thinkink about static typing imagine something like this:
+</p>
+
+<div class="highlight"><pre><code class="language-java" data-lang="java"><span class="n">Foo</span><span class="o">*</span> <span class="n">foo</span> <span class="o">=</span> <span class="k">new</span><span class="o">(</span><span class="n">Foo</span><span class="o">);</span></code></pre></div>
+
+<p>
+    Usually when coders argue about wether static or dynamic typing is teh sh*t, they contrast the dynamically typed languages with C++/Java school of static typing (see above).
+    Sacrificing some sophistication the usual conclusion can be reduced to "static typing can catch more bugs but you have to type more" (let's not go into unit testing now).
+    If that's what you tought too, let me introduce you the <a href="http://en.wikipedia.org/wiki/Hindley%E2%80%93Milner">Hindley-Milner type inference</a>. Basically with the help of it,
+    the compiler can type check your code without requiring you to annotate your types in even one place (I lied, in rare cases, it may be required).
+</p>
+
+<p>
+    And no, Google's new language, Go does not have type inference, at least nothing comparable to what you can find in Haskell.
+    What the Go evangelists try to sell as type inference is a very little subset of (full) type inference. The Go way:
+</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="kd">func</span> <span class="nx">nonsense</span><span class="p">(</span><span class="nx">a</span> <span class="kt">int</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">string</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>    <span class="c1">// &lt;- You have to annotate type or compilation fails.</span>
+    <span class="nx">c</span> <span class="o">:=</span> <span class="mi">42</span> <span class="c1">// &lt;- &quot;Initialization and declaration&quot; which is being sold as type inference</span>
+    <span class="k">return</span> <span class="nx">a</span> <span class="o">+</span> <span class="nx">c</span>
+<span class="p">}</span></code></pre></div>
+
+<p>
+    The Haskell way:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">nonsense</span> <span class="n">a</span> <span class="n">b</span> <span class="ow">=</span> <span class="kr">let</span> <span class="n">c</span> <span class="ow">=</span> <span class="mi">42</span> <span class="kr">in</span> <span class="n">a</span> <span class="o">+</span> <span class="n">c</span></code></pre></div>
+
+<p>
+    That Haskell snippet will compile. What will be the type of it? You can query it by typing ":t nonsense" in GHCi
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">nonsense</span>
+<span class="nf">nonsense</span> <span class="ow">::</span> <span class="kt">Num</span> <span class="n">a</span> <span class="ow">=&gt;</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">t</span> <span class="ow">-&gt;</span> <span class="n">a</span></code></pre></div>
+
+<p>
+    That type signature basically means: nonsense is a function, with two arguments, first is a, which can be any type, as long as that given type can be used as
+    a number (is an instance of type class Num. Don't confuse type classes with Javaish classes, they are more like interfaces). The second argument can be any type, without
+    restriction. Why? Because we did not use it! The return value has the same type as the first argument. This part can be quite tricky to nonhaskellers, because return type
+    polymorphism is very rare in mainstream languages.
+</p>
+
+<p>
+    As you can see, what we have here is the best of both worlds: compile time type checking without the requirement of annotating types by hand. Of course, type annotation is
+    useful for humans, but the Haskell compiler doesn't really care about it, he is clever enough to figure this out. In fact, a lot of times I (and I suspect others too, but I can't
+    speak for them) I write the function without type annotations, ask GHCi for the type signature and paste that into the source file to help others and my 2 months older version of
+    me understanding the code.
+</p>
+
+<h3>Generics without breaking a sweat</h3>
+
+<p>
+    As mindful readers may have already noticed in the above Haskell snippet, in Haskell you write generic code by default. You don't have to learn a template language
+    (there is a thing called Template Haskell but that is another story), you don't have to buy a 24 inch monitor to write generic function signatures. That is the default and
+    it comes for free.
+</p>
+
+<h3>Syntax without clutter</h3>
+
+<p>
+    One thing I noticed while learning Haskell, that the authors have a great sense of beauty. This can be generally said about the language as a whole, but it can be most easily
+    seen when looking at the syntax. Here are a couple of constructs side by side with the Go version, as that is a language I used directly before Haskell thus I hopefully
+    make no errors.
+</p>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Switch case</span>
+
+<span class="c1">// Go</span>
+<span class="nx">a</span> <span class="o">:=</span> <span class="mi">20</span>
+<span class="k">switch</span> <span class="nx">a</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;It&#39;s ten!&quot;</span>
+    <span class="k">case</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s">&quot;It&#39;s not ten :(&quot;</span>
+<span class="p">}</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">//</span> <span class="kt">Haskell</span>
+<span class="kr">let</span> <span class="n">a</span> <span class="ow">=</span> <span class="mi">20</span>
+<span class="kr">in</span> <span class="kr">case</span> <span class="n">a</span> <span class="kr">of</span>
+    <span class="mi">10</span>  <span class="ow">-&gt;</span> <span class="s">&quot;It&#39;s ten!&quot;</span>
+    <span class="mi">20</span>  <span class="ow">-&gt;</span> <span class="s">&quot;It&#39;s not ten :(&quot;</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Anonymous function</span>
+
+<span class="kd">func</span> <span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="nx">a</span> <span class="o">+</span> <span class="nx">b</span>
+<span class="p">}</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">\</span><span class="n">a</span> <span class="n">b</span> <span class="ow">-&gt;</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-go" data-lang="go"><span class="c1">// Looping: transform a list/array</span>
+
+<span class="c1">// Go</span>
+<span class="nx">a</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">}</span>
+<span class="nx">f</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">a</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="nx">a</span><span class="o">+</span><span class="mi">1</span>
+<span class="p">}</span>
+<span class="nx">b</span> <span class="o">:=</span> <span class="p">[]</span><span class="kt">int</span><span class="p">{}</span>
+<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">a</span> <span class="p">{</span>
+    <span class="nx">b</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="nx">b</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">return</span> <span class="nx">v</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">//</span> <span class="kt">Haskell</span>
+<span class="kr">let</span> <span class="n">a</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">10</span><span class="p">]</span>
+    <span class="n">f</span> <span class="ow">=</span> <span class="p">(</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="nf">map</span> <span class="n">f</span> <span class="n">a</span></code></pre></div>
+
+<p>
+    The differences really add up. There are some outrageous claims on the net about how much you can save with functional programming in terms of line count, but I think
+    a good estimate is that you can at least halve the LOCs.
+</p>
+
+<h3>REPL</h3>
+
+<p>
+    Haskell is amongst the few statically typed languages what you can use interactively. GHCi is the Haskell compiler, and despite being a not too mainstream language, it is
+    the Haskell platform is a breeze to use, even on Windows, its a one click install, and you can double click on any hs files and GHCi starts. GHCi is an incredible productivity
+    boost. Just to name a few cool features: :t gives back the type of any expression, :i will display information about the given type, you can set GHCi to clock all expressions
+    (display the milliseconds spent calculating the expression). The possibilities are endless, really.
+</p>
+
+<h3>Type signatures are telling</h3>
+
+<p>
+    The information dense type signature of Haskell functions allow us to effectively search for a function by approximate type with the help of a tool like
+    <a href="http://www.haskell.org/hoogle/">Hoogle</a>.
+</p>
+
+<h3>Conclusion</h3>
+
+<p>
+    The general consensus on Haskell is that it's impractical. I think that opinion mainly stems from old experiences. I agree that it's still rough around some edges:
+    I am particularly worried about the lack of stack traces. The thought of running it on production servers and not seeing the source of an exception frankly scares the
+    sh*t out of me. But as a language it is very well designed, especially compared to the current mainstream languages.
+</p>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2013/03/31/haskell-tutorial-using-ghc-ghci/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

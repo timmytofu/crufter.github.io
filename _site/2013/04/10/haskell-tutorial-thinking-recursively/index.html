@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell tutorial - Thinking recursively </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-04-10T00:00:00+01:00" itemprop="datePublished">
+          10 April 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell tutorial - Thinking recursively</h1>
+    <div itemprop="articleBody">
+      <p>
+    To understand this post, first you should learn...
+</p>
+
+<h3>Patterns and pattern matching</h3>
+
+<p>
+    Patterns allow you to deconstruct certain data structures with the same operators what you use to construct them.
+    This only works in certain places, but we focus on function definitions now.
+    Examine the following one:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">summa</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">summa</span> <span class="n">list</span> <span class="ow">=</span> <span class="kr">if</span> <span class="n">length</span> <span class="n">list</span> <span class="o">==</span> <span class="mi">0</span>
+    <span class="kr">then</span> <span class="mi">0</span>
+    <span class="kr">else</span> <span class="n">head</span> <span class="n">list</span> <span class="o">+</span> <span class="p">(</span><span class="n">summa</span> <span class="p">(</span><span class="n">tail</span> <span class="n">list</span><span class="p">))</span></code></pre></div>
+
+<p>
+    This contains no pattern matching yet. We have to do a lot of grunt work by hand, checking the lenght of the list,
+    accessing the first element (head), calling the function recursively on the remaining list. Pattern matching can help to
+    lessen the pain:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">summa</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">summa</span> <span class="kt">[]</span> <span class="ow">=</span> <span class="mi">0</span>
+<span class="nf">summa</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">summa</span> <span class="n">xs</span></code></pre></div>
+
+<p>
+    Much nicer, right? The cons operator (:) appends an element to a list, so the above quite intiutively reads like this: if we have an empty
+    list, the result is 0. If we have a list with at least one element (x appended to the possibly empty xs), the result is the first element +
+    summa the remaining list.
+</p>
+
+<p>
+    Another good example is the classic (but very inefficient) definition of Fibonacci numbers: 
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">fib</span> <span class="ow">::</span> <span class="kt">Int</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">fib</span> <span class="mi">0</span> <span class="ow">=</span> <span class="mi">0</span>
+<span class="nf">fib</span> <span class="mi">1</span> <span class="ow">=</span> <span class="mi">1</span>
+<span class="nf">fib</span> <span class="n">n</span> <span class="ow">=</span> <span class="n">fib</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="n">fib</span> <span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span></code></pre></div>
+
+<p>
+    The above calculates the fibonacci number in the nth position of the Fibonacci sequence.
+</p>
+
+<h3>Thinking recursively</h3>
+
+<p>
+    Every iterative algorithm and can be expressed as recursion and <a href="http://en.wikipedia.org/wiki/Vice_Versa">vice versa</a>.
+    In Haskell, recursion is the norm, since iteration is impossible to do without mutable variables. This can be tricky to imagine for newbies,
+    so let's look at a couple of examples.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Counts how many element satisfies the predicate in a list.</span>
+<span class="nf">count</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">count</span> <span class="n">p</span> <span class="n">xs</span> <span class="ow">=</span> <span class="n">f</span> <span class="mi">0</span> <span class="n">xs</span>
+    <span class="kr">where</span>
+        <span class="n">f</span> <span class="n">c</span> <span class="kt">[]</span> <span class="ow">=</span> <span class="mi">0</span>
+        <span class="n">f</span> <span class="n">c</span> <span class="p">(</span><span class="n">y</span><span class="kt">:</span><span class="n">ys</span><span class="p">)</span> <span class="ow">=</span>
+            <span class="kr">let</span> <span class="n">v</span> <span class="ow">=</span> <span class="kr">if</span> <span class="n">p</span> <span class="n">y</span> <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="mi">0</span>
+            <span class="kr">in</span> <span class="n">f</span> <span class="p">(</span><span class="n">c</span> <span class="o">+</span> <span class="n">v</span><span class="p">)</span> <span class="n">ys</span></code></pre></div>
+
+<p>
+    The where construct in the above example is a simple way to define local functions and variables.
+    Where is similar to the <b>let ... in</b> form, the only difference is that ith let the definitions come before the expression body, with where
+    they stand after it.
+</p>
+
+<p>
+    Our count function works by defining a recursive local function called <b>f</b>, which passes state as one of its arguments.
+    Every recursive invocation can be tought of as one iteration. The same function in JavaScript would look like this:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">function</span> <span class="n">count</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">list</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">var</span> <span class="n">counter</span> <span class="ow">=</span> <span class="mi">0</span>
+    <span class="n">for</span> <span class="p">(</span><span class="n">var</span> <span class="n">i</span> <span class="kr">in</span> <span class="n">list</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kr">if</span> <span class="p">(</span><span class="n">pred</span><span class="p">(</span><span class="n">list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">==</span> <span class="n">true</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">counter</span><span class="o">++</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">return</span> <span class="n">counter</span>
+<span class="p">}</span></code></pre></div>
+
+<p>
+    A side note: a nice thing in Haskell is that we can be lazy (pun intended) and use the existing functions to express our thoughts. It really feels like synthesis.
+    Instead of controlling every nuance of the code, we can usually achieve our goals in a couple of steps. Our count function would look like:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">count</span> <span class="ow">::</span> <span class="n">count</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="nf">count</span> <span class="n">p</span> <span class="n">xs</span> <span class="ow">=</span> <span class="n">length</span> <span class="o">$</span> <span class="n">filter</span> <span class="n">p</span> <span class="n">xs</span></code></pre></div>
+
+<p>
+    But currently we care about writing these functions ourselves to learn the thought process behind them. However, it would be silly to ignore the wide range of
+    already written functions in the Haskell standard library (Prelude). Yes, you've heard it! Unlike in C++ or a lot of other langauges, the Haskell Prelude
+    is full of readable, idiomatic functions. Reading them is a pleasure. Let's look at a couple of them.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">map</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span>
+<span class="nf">map</span> <span class="kr">_</span> <span class="kt">[]</span>     <span class="ow">=</span> <span class="kt">[]</span>
+<span class="nf">map</span> <span class="n">f</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span> <span class="ow">=</span> <span class="n">f</span> <span class="n">x</span> <span class="kt">:</span> <span class="n">map</span> <span class="n">f</span> <span class="n">xs</span></code></pre></div>
+
+<p>
+    The implementation is map is actually very straightforward, we apply the function f to the first element of a list, and append that element to the 
+    remaining of the also mapped list. If you are not already blown away by the elegance of it, I suggest you to learn Java.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">filter</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+<span class="nf">filter</span> <span class="n">_pred</span> <span class="kt">[]</span>    <span class="ow">=</span> <span class="kt">[]</span>
+<span class="nf">filter</span> <span class="n">pred</span> <span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span>
+  <span class="o">|</span> <span class="n">pred</span> <span class="n">x</span>         <span class="ow">=</span> <span class="n">x</span> <span class="kt">:</span> <span class="n">filter</span> <span class="n">pred</span> <span class="n">xs</span>
+  <span class="o">|</span> <span class="n">otherwise</span>      <span class="ow">=</span> <span class="n">filter</span> <span class="n">pred</span> <span class="n">xs</span></code></pre></div>
+
+<p>
+    Filter is quite similar to map, but there is new syntax here: guards. Guards are basically pretty switches, the first case evaluating to true
+    will be evaluated. The definition reads: if the list is empty, return the empty list. If the list is not empty, check if the predicate holds true on
+    the first element of the list, if it does, append the given element to the remaining of the list.
+</p>
+
+<p>
+    Most people when hear that Haskell has no mutable variables (not counting the IO monad, more on this later) are terrified by the idea
+    and they think that working with immutability is half impossible and half crazy. But in fact, recursive solutions are often very concise
+    and easy to write. Pattern matching helps us to visualize corner cases (empty list, zero, etc) when we have to terminate our recursion, or act differently.
+</p>
+
+<h3>Performance</h3>
+
+<p>
+    Haskell lends itself especially well to recursive expressions. In imperative languages, recursion is considered slow, and iteration is preferred.
+    Since Haskell is optimized for recursion, you don't have to fear a performance
+    penalty. <a href="http://en.wikipedia.org/wiki/Tail_call">Tail call optimization</a> actually ensures that when a function calls itself in tail position
+    (see the summa example), the resulting machine code will be identical to loops.
+</p>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2014/12/01/everyday-hassles-in-go/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+      <a rel="prev" href="/2013/04/06/haskell-tutorial-lists/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

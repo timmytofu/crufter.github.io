@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell tutorial - Lists </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-04-06T00:00:00+01:00" itemprop="datePublished">
+          06 April 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell tutorial - Lists</h1>
+    <div itemprop="articleBody">
+      <p>
+    In the previous post we met most of the basic types:
+</p>
+
+<pre>
+Name        Example     Description
+--          -------     -----------
+Int         300         Machine word sized integer.
+Integer     300         Infinite sized integer.
+Float       3.2         Floating point numbers.
+Double      3.2         Double precision floating point numbers.
+Char        'a'         A single character.
+Bool        True        Boolean type, can take two values: True or False.
+</pre>
+
+<p>
+    As you can see, there is nothing complex about them. Lists are a bit different. The term "list" is not a concrete type. We can talk about
+    a list of Chars, a list of Ints, a list of Floats and so on. Please meditate on this since this is an incredibly important and powerful concept: some
+    abstract types need one or more additional types to produce a concrete type. And lists are a very good example to show that. First, note that we could mentally
+    replace the type <b>[a]</b> with <b>List a</b>, as the [] is just syntactic sugar. In this regard, the list type is special, but only in cosmetics.
+</p>
+
+<h3>Higher kinded types</h3>
+
+<p>
+    If you want to amuse girls, you may want to learn the proper terminology for those above mentioned "abstract types": they are called higher kinded types.
+    You can also refer to <b>List</b> as being a type constructor, while <b>List a</b> is a lower kinded type, or in layman terms a concrete type, or simply a type.
+    GHCi is still your friend, there is a command, :k, which will return you the kind of a type.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">k</span> <span class="kt">Int</span>
+<span class="kt">Int</span> <span class="ow">::</span> <span class="o">*</span>
+
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">k</span> <span class="kt">[]</span>
+<span class="kt">[]</span> <span class="ow">::</span> <span class="o">*</span> <span class="ow">-&gt;</span> <span class="o">*</span>
+
+<span class="o">&gt;:</span><span class="n">k</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]</span>
+<span class="p">[</span><span class="kt">Int</span><span class="p">]</span> <span class="ow">::</span> <span class="o">*</span>
+
+<span class="o">&gt;</span> <span class="kr">import</span> <span class="nn">Data.Map</span>
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">k</span> <span class="kt">Map</span>
+<span class="kt">Map</span> <span class="ow">::</span> <span class="o">*</span> <span class="ow">-&gt;</span> <span class="o">*</span> <span class="ow">-&gt;</span> <span class="o">*</span></code></pre></div>
+
+<p>
+    Wohoo! We are advancing so fast. The <b>-&gt;</b> symbol means the same as in function type signatures: it separates the inputs and the
+    output of a function. Type constructors are functions too, the only difference is that they work on types, and not on values. Let's interpret those lines.
+    Int is a lower kinded type, [] is a type constructor, [Int] is again a simple lower kinded type,
+    and we imported the module Data.Map just for the sake of it. It serves as an example about how a higher kinded type can need more than one type to produce
+    a concrete type. List needs one, why? The elements in that list have a type too. But a Map can needs one type for the key, and one for the value.
+</p>
+
+<h3>Creating lists</h3>
+
+<p>
+    To create a list, we have to list values belonging to the same type, separated by commas, inside square brackets:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">let</span> <span class="n">x</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">x</span>
+<span class="nf">x</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Integer</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="kr">let</span> <span class="n">y</span> <span class="ow">=</span> <span class="p">[</span><span class="kt">True</span><span class="p">,</span> <span class="kt">False</span><span class="p">,</span> <span class="kt">False</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">y</span>
+<span class="nf">y</span> <span class="ow">::</span> <span class="p">[</span><span class="kt">Bool</span><span class="p">]</span></code></pre></div>
+
+<p>
+    We can do enumeration very easily too (if the given type is an instance of the Enum type class):
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">20</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">19</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="p">[</span><span class="n">&#39;a&#39;</span><span class="o">..</span><span class="n">&#39;z&#39;</span><span class="p">]</span>
+<span class="s">&quot;abcdefghijklmnopqrstuvwxyz&quot;</span></code></pre></div>
+
+<h3>Lazy evaluation</h3>
+
+<p>
+    Once thing you must keep in mind that since Haskell has non-strict evaluation, you can work with very large, even infinite lists without killing your machine.
+    We already now the head function.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="c1">-- This is how you define an infinite list:</span>
+<span class="o">&gt;</span> <span class="kr">let</span> <span class="n">x</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">head</span> <span class="n">x</span>
+<span class="mi">1</span></code></pre></div>
+
+<p>
+    In strict languages the infinite list would halt our program (at least this thread), but not in Haskell. When we assign x the infinite list, the list is not
+    constructed immediately, only when needed, and even then, not the whole list, but only the needed parts will be calculated. This may seem contrived at first,
+    I mean what was the last time you needed infinitely large lists, right? Our RAM is not infinite?  When programming in Haskell,
+    we usually word our thoughts in a way which is very close to mathematics. That's why the language is sometimes called an "executable specification language".
+    The problem is that math definitions do not match the underlying hardware, and this creates performance problems. Non-strict, or lazy evaluation helps to lessen
+    the severity of this problem by allowing us to word our algorithm in a concise and elegant way, without going into details and micro-manage every variable,
+    without suffering a performance penalty.
+</p>
+
+<h3>Working with lists</h3>
+
+<p>
+    The module <a href="http://hackage.haskell.org/packages/archive/base/4.3.0.0/doc/html/Prelude.html">Prelude</a> is imported by default. It contains
+    very useful list manipulation functions. It is worthy to know most of them since many problems can be solved with list manipulation.
+    The most used functions are:
+</p>
+
+<h4>length</h4>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">length</span>
+<span class="nf">length</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="kt">Int</span>
+<span class="o">&gt;</span> <span class="n">length</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">10</span><span class="p">]</span>
+<span class="mi">11</span></code></pre></div>
+
+<p>
+    Length (amazingly) returns the length of the list.
+</p>
+
+<h4>(:)</h4>
+
+<p>
+    The cons operator makes it possible to append an element to the beginning of a list. This is an O(1) operation, unlike appending to the end of a singly
+    linked list.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="p">(</span><span class="kt">:</span><span class="p">)</span>
+<span class="p">(</span><span class="kt">:</span><span class="p">)</span> <span class="ow">::</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="mi">1</span><span class="kt">:</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span></code></pre></div>
+
+<p>
+    This operator is right associative, we can conveniently append mutiple elements:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">i</span> <span class="p">(</span><span class="kt">:</span><span class="p">)</span>
+<span class="kr">data</span> <span class="kt">[]</span> <span class="n">a</span> <span class="ow">=</span> <span class="o">...</span> <span class="o">|</span> <span class="n">a</span> <span class="kt">:</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>       <span class="c1">-- Defined in `GHC.Types&#39;</span>
+<span class="kr">infixr</span> <span class="mi">5</span> <span class="kt">:</span>
+<span class="o">&gt;</span> <span class="mi">1</span><span class="kt">:</span><span class="mi">2</span><span class="kt">:</span><span class="mi">3</span><span class="kt">:[]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span></code></pre></div>
+
+<h4>(++)</h4>
+
+<p>
+    The ++ operator concatenates to lists.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="p">(</span><span class="o">++</span><span class="p">)</span>
+<span class="p">(</span><span class="o">++</span><span class="p">)</span> <span class="ow">::</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="o">++</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">,</span><span class="mi">30</span><span class="p">]</span></code></pre></div>
+
+<h4>head, last, init, tail, (!!)</h4>
+
+<p>
+    These functions allow you to extract elements and sublists from lists easily.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="n">head</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">5</span><span class="p">]</span>
+<span class="mi">1</span>
+<span class="o">&gt;</span> <span class="n">last</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">5</span><span class="p">]</span>
+<span class="mi">5</span>
+<span class="o">&gt;</span> <span class="n">init</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">5</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">last</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">5</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">5</span><span class="p">]</span><span class="o">!!</span><span class="mi">2</span>
+<span class="mi">3</span></code></pre></div>
+
+<p>
+    Lists are zero indexed in Haskell, which means we refer to the first element as not the first, but rather as the 0th element.
+</p>
+
+<h4>map</h4>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">map</span>
+<span class="nf">map</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">b</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">b</span><span class="p">]</span></code></pre></div>
+
+<p>
+    Map is a higher order function, which means that it either takes functions as its input or returns a function. The () in the signature means a function.
+    Map takes a function and a list and it builds a new list by applying that function to every element of the input list. Let's say we have a function double, which
+    can double a number, and a list of numbers. Issuing <b>map double list</b> will return a list with the doubled numbers:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">let</span> <span class="n">double</span> <span class="n">x</span> <span class="ow">=</span> <span class="n">x</span> <span class="o">*</span> <span class="mi">2</span>
+<span class="o">&gt;</span> <span class="kr">let</span> <span class="n">myList</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">..</span><span class="mi">10</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">myList</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">]</span>
+<span class="o">&gt;</span> <span class="n">map</span> <span class="n">double</span> <span class="n">myList</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span></code></pre></div>
+
+<h4>filter</h4>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">filter</span>
+<span class="nf">filter</span> <span class="ow">::</span> <span class="p">(</span><span class="n">a</span> <span class="ow">-&gt;</span> <span class="kt">Bool</span><span class="p">)</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="ow">-&gt;</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span></code></pre></div>
+
+<p>
+    Filter takes a predicate (a function returning a boolean value) and a list, and returns a new list containing only the values which satisfies the predicate.
+    An example would be to filter numbers based on whether they are even:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">rem</span>
+<span class="nf">rem</span> <span class="ow">::</span> <span class="kt">Integral</span> <span class="n">a</span> <span class="ow">=&gt;</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">a</span> <span class="ow">-&gt;</span> <span class="n">a</span>
+<span class="c1">-- Integral is a type class implemented by both Int and Integer types.</span>
+<span class="c1">-- Do :i Integral for more information</span>
+
+<span class="o">&gt;</span> <span class="kr">let</span> <span class="n">isEven</span> <span class="n">x</span> <span class="ow">=</span> <span class="n">rem</span> <span class="n">x</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="o">&gt;</span> <span class="n">filter</span> <span class="n">isEven</span> <span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">20</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">20</span><span class="p">]</span></code></pre></div>
+
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2013/04/10/haskell-tutorial-thinking-recursively/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+      <a rel="prev" href="/2013/04/05/haskell-tutorial-types-type-classes/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

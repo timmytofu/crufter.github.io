@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell tutorial - Using GHC, GHCi </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-03-31T00:00:00+00:00" itemprop="datePublished">
+          31 March 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell tutorial - Using GHC, GHCi</h1>
+    <div itemprop="articleBody">
+      <p>
+    After installing the Haskell platform we have access to both the Glasgow Haskell Compiler (GHC) and the interpreter,
+    GHCi. Throughout this tutorial series I will use GHCi, because it is interactive and easy to use. Nevertheless, here is
+    how you compile a Haskell program with GHC:
+</p>
+
+<p>
+    Let's say you create a file "C:/hsfiles/hello.hs". Copy and paste the following line into the file:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">main</span> <span class="ow">=</span> <span class="n">print</span> <span class="s">&quot;Hello world.&quot;</span></code></pre></div>
+
+<p>
+    The main function is where your program starts. If you write a library, that will obviously have no main function, but now we want to
+    produce a working executable, so here it is. Once you have the file with the above content, start the command line.
+</p>
+
+<pre>
+&gt; cd hsfiles
+&gt; ghc hello.hs
+</pre>
+
+<p>
+    After this, you will have a file "C:/hsfiles/hello.exe". Success! If you double click on the exe you will only see a flash, because as soon as it prints
+    the line "Hello world.", it quits. To avoid this, turn to the command line again and start the program from there. Hopefully you didn't close
+    it, but if you did, step into the "C:/hsfiles" folder again.
+</p>
+
+<pre>
+&gt; hello.exe
+"Hello world."
+</pre>
+
+<h3>GHCi</h3>
+
+<p>
+    Yay! You don't have to compile that hello.hs file though. If you double click on it, GHCi, the Haskell interpreter starts, and you can work
+    with your file interactively. GHCi is a really powerful tool which enables you to work productively with Haskell. Once GHCi runs and the hello.hs
+    file is loaded, you can call the defined functions (currently only main) by name. You don't even have to know the full function name, GHCi does
+    autocompletion by default, for example: type m and tab, and it will print all functions starting with m.
+</p>
+
+<pre>
+&gt; main
+"Hello world."
+</pre>
+
+<p>
+    There are a couple of commands which makes your life easier. One of the most important is, especially while you are learning the ":t" command,
+    which prints the type of a given value or expression.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kt">:</span><span class="n">t</span> <span class="n">main</span>
+<span class="nf">main</span> <span class="ow">::</span> <span class="kt">IO</span> <span class="nb">()</span></code></pre></div>
+
+<p>
+    Don't be afraid if you don't understand that now, we will cover it later. The ":i" command is similar, but more detailed: it prints the
+    place of definition, the definition itself in in case of records, or instances of a given type class in case of type classes.
+    If you modify the source file and want to reload it, use the ":r" command.
+</p>
+
+<p>
+    One more word on GHCi. When we work with the interpreter, we are already inside a thing called the "IO monad". That may sound scary, but all you have to
+    remember now that when we define something with the help of the "let" construct, we do that because of that. The difference is:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Define a function in a file</span>
+<span class="nf">f</span> <span class="n">x</span> <span class="n">y</span> <span class="ow">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span>
+
+<span class="c1">-- Define a function in the interpreter (GHCi)</span>
+<span class="kr">let</span> <span class="n">f</span> <span class="n">x</span> <span class="n">y</span> <span class="ow">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span></code></pre></div>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2013/04/04/haskell-tutorial-installation/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+      <a rel="prev" href="/2013/03/31/haskell-practical-advantages/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

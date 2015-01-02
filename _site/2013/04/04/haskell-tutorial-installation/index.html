@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell tutorial - Installation </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-04-04T00:00:00+01:00" itemprop="datePublished">
+          04 April 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell tutorial - Installation</h1>
+    <div itemprop="articleBody">
+      <p>
+    This is the first post in my Haskell tutorial series. As I am currently teaching one of my friends Haskell, I thought documenting
+    the process could benefit some. Often a different wording can shed light on an issue, so here is my take. The person in question knows
+    a bit of <a href="http://golang.org/">Go</a>, but he is mostly a beginner to programming.
+</p>
+
+<p>    
+    I will try to assume as little programming knowledge as possible but if you have never coded a line in your life you should consider
+    consulting an other source, or picking an easier language to start with, depending on your goal. If you want to learn programming to
+    create applications as soon as possible, I think Haskell may not be the best option because it requires a will of steel to get to a level
+    where you can fluently express your thoughts and where you can read and use 3rd party libraries with ease. If your primary goal is
+    to learn a beautifully designed language which implements a wide range of cutting edge features, but still very effective in the
+    practical world with enough determination, then Haskell is unsurpassed at the time of writing this.
+</p>
+
+<p>
+    Having experience with a language with closure support, and/or with a language having a static type system would be a plus. 
+    I will try to provide parallel code examples in JavaScript too where it makes sense for those coming from imperative languages.
+    JavaScript was chosen because it is the most popular language to date, and everyone has access to JS interpreters - just fire up a browser.
+</p>
+
+<h3>Get the Haskell Platform</h3>
+
+<p>
+    The easiest way to install Haskell is to download the <a href="http://www.haskell.org/platform/">Haskell platform</a>.
+    It is a batteries included package, and it only takes a click to install. I use it on Windows which is generally a not too well supported
+    platform by non-mainstream languages but the Haskell platform works flawlessly for me, and I don't hear complains about it in the Haskell IRC
+    channel (#haskell on Freenode) either. That IRC channel by the way may is full of helpful people, so feel free to ask for help there,
+    we are very welcoming to beginners. If you don't know how to use an IRC client, <a href="http://webchat.freenode.net/">here is an online one</a>.
+    Don't forget the hash from the #haskell channel name when you try to log in.
+</p>
+
+<h3>Install packages with cabal</h3>
+
+<p>
+    After you installed the platform you can also install individual modules written by different Haskell programmers. There is a central repository
+    where most packages can be found (those which are uploaded by their authors), it is called <a href="http://hackage.haskell.org/packages/hackage.html">
+    Hackage</a>. If you find a package you would like to use you can issue the next command in the command line:
+</p>
+
+<pre>
+cabal install pkg-name
+</pre>
+
+<p>
+    Where pkg-name obviously changes depending on your needs. Cabal is the name of the tool which handles the module installation magic.
+    This command will only work when the given module is in HackageDB already. If you downloaded a module yourself, to install, you must step into the
+    directory where this module resides. You can recognise an installable module easily, search for files like:
+</p>
+
+<pre>
+pkg-name.cabal
+Setup.hs
+</pre>
+
+<p>
+    When you are in the proper director, just issue <b>cabal install</b> without any modulename.
+</p>
+
+<h4>Finding modules</h4>
+
+<p>
+    There is no use in package manager tools if you don't know what do you want to install.
+    There is a very useful for Haskell programmers <a href="http://www.haskell.org/hoogle/">Hoogle</a>, it lets you search for Haskell
+    functions by name or signature. Type signatures in Haskell are very telling, I will explain later why.
+</p>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2013/04/05/haskell-tutorial-basics/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+      <a rel="prev" href="/2013/03/31/haskell-tutorial-using-ghc-ghci/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>

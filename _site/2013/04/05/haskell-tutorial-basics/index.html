@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+      <title> Haskell tutorial - Basics </title>
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+      <meta http-equiv="content-language" content="en-gb" />
+      <meta name="description" content="Fluid, responsive blog theme for Jekyll.">
+      <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+      <link href="//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,700|Lora:400,700,400italic" rel="stylesheet" type="text/css">
+      <link rel="stylesheet" type="text/css" href="/css/main.css" />
+      <link href="atom.xml" type="application/atom+xml" rel="alternate" title="Site ATOM Feed">
+  </head>
+
+  <body>
+    <!--[if lt IE 7]>
+        <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+    <![endif]-->
+
+    <div class="off-canvas">
+      <figure class="avatar">
+        <img src="/assets/img/avatar.jpg" alt="Picture" title="That's me, Janos Dobronszki.">
+      </figure>
+      <div class="bio">
+          <h1>Hi, I'm Janos Dobronszki.</h1>
+          <p>Abusing the english language on this site since 2013</p>
+      </div>
+      <nav>
+        <h6>Follow me on</h6>
+        <ul>
+          
+          <li><a target="_blank" href="http://twitter.com/crufter">Twitter</a></li>
+          
+          
+          <li><a target="_blank" href="https://github.com/crufter">Github</a></li>
+          
+          
+          
+        </ul>
+      </nav>
+    </div>
+
+
+    <div class="site-wrapper">
+
+      <header>
+        <div class="h-wrap">
+          <h1 class="title"><a href="/" title="Back to Homepage">crufter</a></h1>
+          <a class="menu-icon" title="Open Bio"><span class="lines"></span></a>
+        </div>
+      </header>
+
+      <main>
+        <section class="single-wrap">
+  <article class="single-content" itemscope itemtype="http://schema.org/BlogPosting">
+    <div class="feat">
+      <h5 class="page-date">
+        <time datetime="2013-04-05T00:00:00+01:00" itemprop="datePublished">
+          05 April 2013
+        </time>
+      </h5>
+    </div>
+    <h1 class="page-title" itemprop="name headline">Haskell tutorial - Basics</h1>
+    <div itemprop="articleBody">
+      <h3>Expressions vs. statements</h3>
+
+<p>
+    If you are entirely new to programming please visit this
+    <a href="http://en.wikipedia.org/wiki/Expression_(computer_science)">Wikipedia entry about expressions</a>.
+    The first line contains a couple of terms wich will be our main vocabulary in this post.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="mi">3</span>       <span class="c1">-- Constant</span>
+<span class="s">&quot;Hello&quot;</span> <span class="c1">-- Constant</span>
+<span class="nf">x</span>       <span class="c1">-- Variable</span>
+<span class="nf">y</span>       <span class="c1">-- Variable</span>
+<span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span>   <span class="c1">-- Expression, when evaluated, yields a value (5)</span></code></pre></div>
+
+<p>
+    Haskell is an expression based language. There are no statements in it, like in imperative ones. The following
+    example illustrates the difference between an expression and a statement.
+</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// JavaScript</span>
+<span class="kd">var</span> <span class="nx">condition</span> <span class="o">=</span> <span class="kc">true</span>
+<span class="kd">var</span> <span class="nx">x</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">condition</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">x</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">x</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="p">}</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Haskell</span>
+<span class="kr">let</span> <span class="n">condition</span> <span class="ow">=</span> <span class="kt">True</span>
+    <span class="n">x</span> <span class="ow">=</span> <span class="kr">if</span> <span class="n">condition</span>
+        <span class="kr">then</span> <span class="mi">3</span>
+        <span class="kr">else</span> <span class="mi">5</span></code></pre></div>
+
+<p>
+    As you can see, in Haskell the if expression returns a value, while in JavaScript the if is a statement, and you modify the value of x
+    from a branch of the if. Now, modifying values is something you do rarely in Haskell, because it is a "pure" language.
+    Once you assigned a variable a value, you can never change it. In this sense, these variables are very close to their cousins in math.
+    It is worthy to note that branches of an if expression must return values which has the same type. Thus, the following example causes
+    a type error:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="kr">if</span> <span class="kt">True</span> <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="s">&quot;Hello&quot;</span>
+
+<span class="o">&lt;</span><span class="n">interactive</span><span class="o">&gt;:</span><span class="mi">2</span><span class="kt">:</span><span class="mi">14</span><span class="kt">:</span>
+    <span class="kt">No</span> <span class="kr">instance</span> <span class="n">for</span> <span class="p">(</span><span class="kt">Num</span> <span class="p">[</span><span class="kt">Char</span><span class="p">])</span>
+    <span class="n">arising</span> <span class="n">from</span> <span class="n">the</span> <span class="n">literal</span> <span class="p">`</span><span class="mi">1</span><span class="n">&#39;</span>
+    <span class="kt">Possible</span> <span class="n">fix</span><span class="kt">:</span> <span class="n">add</span> <span class="n">an</span> <span class="kr">instance</span> <span class="n">declaration</span> <span class="n">for</span> <span class="p">(</span><span class="kt">Num</span> <span class="p">[</span><span class="kt">Char</span><span class="p">])</span>
+    <span class="kt">In</span> <span class="n">the</span> <span class="n">expression</span><span class="kt">:</span> <span class="mi">1</span>
+    <span class="kt">In</span> <span class="n">the</span> <span class="n">expression</span><span class="kt">:</span> <span class="kr">if</span> <span class="kt">True</span> <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="s">&quot;Hello&quot;</span>
+    <span class="kt">In</span> <span class="n">an</span> <span class="n">equation</span> <span class="n">for</span> <span class="p">`</span><span class="n">it&#39;</span><span class="kt">:</span> <span class="n">it</span> <span class="ow">=</span> <span class="kr">if</span> <span class="kt">True</span> <span class="kr">then</span> <span class="mi">1</span> <span class="kr">else</span> <span class="s">&quot;Hello&quot;</span></code></pre></div>
+
+<p>
+    The error itself may look scary for a Haskell beginner, but fear not, you will develop an intuition for them pretty soon.
+    Please note that I use the "&gt;" character to indicate the prompt in GHCi.
+</p>
+
+<h3>Function application</h3>
+
+<p>
+    Function application may be quite unusual for programmers coming from imperative languages: there are no parentheses, only spaces:
+</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// JavaScript</span>
+<span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Haskell</span>
+<span class="nf">add</span> <span class="mi">1</span> <span class="mi">2</span></code></pre></div>
+
+<p>
+    This allows us to spare a couple of parens. You can evaluate an expression before passing it to a function too:
+</p>
+
+<div class="highlight"><pre><code class="language-js" data-lang="js"><span class="c1">// JavaScript</span>
+<span class="nx">add</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nx">sub</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span></code></pre></div>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="c1">-- Haskell</span>
+<span class="nf">add</span> <span class="mi">1</span> <span class="p">(</span><span class="n">sub</span> <span class="mi">4</span> <span class="mi">3</span><span class="p">)</span></code></pre></div>
+
+<p>
+    In Haskell, expressions are evaluated only when needed, which is called non-strict, or lazy evaluation. The following snippet does not actually
+    raise an error, contrary to the intuition.
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="kr">let</span> <span class="n">list</span> <span class="ow">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="ne">error</span> <span class="s">&quot;Hey.&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span></code></pre></div>
+
+<p>
+    In a strict language, we could not even store the list, because the evaluation of the error would happen before constructing the list.
+    In Haskell, this is not the case. The error will only be raised if that value will be used. This requires an entirely different mindset to predict
+    the performance characteristics of a program, but at the same time it allows us to glue our existing functions in a more modular fashion.
+</p>
+
+<p>
+    One of the most enlightening example of the modularity provided by lazy evaluation is the following:
+    imagine that we need to get the smallest element in a list and we have no minimum function, but
+    we have a function which can sort us the list. Now, if we sort the list in ascending order, the first element will be the smallest, but sorting an entire list
+    to only get the first element is entirely wasteful. It is, in strict languages. But in non-strict ones, the sorting will only happen if needed: if we
+    only need the first value, the sorting algorithm will only do the sorting until it can produce that one value we need: it will do no unnecessary work!
+    If that did not blow your mind I suggest you to stand in the corner until you realize how awesome it is.
+</p>
+
+<h3>Defining values</h3>
+
+<p>
+    Defining values at top level is easy:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">x</span> <span class="ow">=</span> <span class="mi">3</span>
+<span class="nf">y</span> <span class="ow">=</span> <span class="s">&quot;Hello&quot;</span>
+<span class="nf">z</span> <span class="ow">=</span> <span class="n">y</span></code></pre></div>
+
+<p>
+    Ignoring the precise type of those expression, I think you can guess that x will be a number, y is a string,
+    and z has the same value and type as z.
+</p>
+
+<h3>Function definition</h3>
+
+<p>
+    This is the exciting part! We will do actual computation here. The fact is, Haskell is an shamelessly concise language:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="nf">add</span> <span class="n">x</span> <span class="n">y</span> <span class="ow">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span></code></pre></div>
+
+<p>
+    That's it! That line will add two numbers. Admittedly not too useful, but hey! We have to start somewhere. Using it is also as easy as ABC:
+</p>
+
+<div class="highlight"><pre><code class="language-haskell" data-lang="haskell"><span class="o">&gt;</span> <span class="n">add</span> <span class="mi">3</span> <span class="mi">5</span>
+<span class="mi">8</span></code></pre></div>
+
+<p>
+    To venture deeper into the language we will have to befriend the types, but that is a story for an other day.
+</p>
+
+    </div>
+    <div class="feat share">
+      <a href="http://twitter.com/share" class="popup">
+        <span class="icon-twitter"></span>
+      </a>
+    </div>
+    
+      <a rel="next" href="/2013/04/05/haskell-tutorial-types-type-classes/" id="next">
+        <span class="nav-title nav-title-next">newer</span> &rarr;
+      </a>
+    
+    
+      <a rel="prev" href="/2013/04/04/haskell-tutorial-installation/" id="prev">
+        &larr; <span class="nav-title nav-title-prev">older</span>
+      </a>
+    
+  </article>
+</section>
+
+      </main>
+
+      <footer>
+        <small>Powered by Jekyll - Theme: <a href="https://github.com/m3xm/hikari-for-Jekyll">hikari</a> - &copy; Janos Dobronszki</small>
+      </footer>
+
+    </div> 
+    
+
+    <script src="/js/main.js"></script>
+    
+    
+
+  </body>
+</html>
