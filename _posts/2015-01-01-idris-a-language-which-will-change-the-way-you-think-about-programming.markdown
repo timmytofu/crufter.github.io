@@ -6,11 +6,11 @@ date:   2015-01-01
 
 <b>This article is under development.</b>
 
-Plenty programming languages barely differ from each other apart from superficial syntax differences, but not Idris. Idris, having a type system supporting dependent types and other innovative ideas, opens up a host of possibilities few other language provides.
+Most programming languages barely differ from each other apart from superficial syntax differences, but not Idris. Idris, having a type system supporting dependent types and other innovative ideas, opens up a host of possibilities few other language provides.
 
 When we want to ensure that a piece of code works as intended the usual tool we use is testing. Testing provides plenty of benefits, but wouldn't you prefer to encode your tests right in the type signature and let the compiler decide if your code is correct given those constraints? With Idris you can do exactly that.
 
-Let's investigate how by comparing a very simple list operation, append, or (++) in the two languages. Append in Haskell has the following type signature:
+Let's investigate how by comparing a very simple list operation, append, also called (++) in the two languages. Append in Haskell has the following type signature:
 
 {% highlight haskell %}
 Prelude> :t (++)
@@ -26,15 +26,13 @@ Prelude.Strings.(++) : String -> String -> String
 Prelude.Vect.(++) : Vect m a -> Vect n a -> Vect (m + n) a
 {% endhighlight %}
 
-When we have a look at the Prelude.List.(++), we can see that it matches the Haskell version - it tells us that it takes two lists and returns a third one - it doesn't say a single word about the lengths of those lists. But if we look at the Prelude.Vect append, we see some pretty funky things:
+When we have a look at the Prelude.List.(++), we can see that it matches the Haskell version - it tells us that it takes two lists and returns a third one - it doesn't say a single word about the lengths of those lists. But if we look at append for the Prelude.Vect type (vectors are a kind of lists with a size), we see the signature describing the size of the vector: 
 
 {% highlight haskell %}
 Prelude.Vect.(++) : Vect m a -> Vect n a -> Vect (m + n) a
 {% endhighlight %}
 
-It's like as if the interpreter is cheeky enough to tell you that there is more to be seen here.
-
-Vectors, are a special kind of lists. In dependent type terminology a vector is a list indexed over its length, or in laymen's terms the type of a vector is a list with a size. This is remotely similar to the concept of fixed sized arrays, (for example, in Go) a [4]int is not the same type as a [5]int. However in Idris, we can not only describe that those lists have different type, but as we can see above we can also express how a given property - in this case the length of a list - changes as a result of a function. As <a href="http://en.wikipedia.org/wiki/Formal_verification">Wikipedia succintly states</a>:
+In dependent type terminology a vector is a list indexed over its length, or in laymen's terms the type of a vector is a list with a size. This is remotely similar to the concept of fixed sized arrays, (for example, in Go) a [4]int is not the same type as a [5]int. However in Idris, we can not only describe that those lists have different type, but as we can see above we can also express how a given property - in this case the length of a list - changes as a result of a function. As <a href="http://en.wikipedia.org/wiki/Formal_verification">Wikipedia succintly states</a>:
 
 > A promising type-based verification approach is dependently typed programming, in which the types of functions include (at least part of) those functions' specifications, and type-checking the code establishes its correctness against those specifications.
 
