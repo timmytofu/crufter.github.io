@@ -84,12 +84,14 @@ vapp1 (x :: x' :: xs)   ys = x :: x :: vapp xs ys
 vapp1 (x :: xs)         ys = x :: vapp xs ys
 {% endhighlight %}
 
-This compiling program almost works perfectly but it does have a quirk:
+This compiling program almost works perfectly but it does have a quirk; the first element from the first argument is present twice, once on the 1st position correctly, and on the second position incorrectly, deleting the second element:
 
 {% highlight haskell %}
 *vapp> vapp1 [1,2,3] [4,5,6]
 [1, 1, 3, 4, 5, 6] : Vect 6 Integer
 {% endhighlight %}
+
+So we have proved that whatever is stated in the type signature is guaranteed to be correct - but nothing else may be. In our append example we state that 'given vector a and vector b, calling append with those vectors as arguments will yield a vector with a length of length a + length b'. It does not state that the resulting vector will contain any element from the argument vectors, or if the order is preserved or anything else! But this is pretty obvious since how could the compiler decide wether a code is correct or not if we do not tell it the criteria to judge a piece of code by. Mind reading based programming is not invented yet, unfortunately.
 
 Idris version used to compile code snippet(s):
 
