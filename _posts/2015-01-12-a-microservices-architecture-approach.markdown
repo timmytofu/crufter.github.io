@@ -21,12 +21,12 @@ In the following a design from simpler to more complex will be explained
 
 A service for the service caller does not have to be more than a collection of functions accepting and returning some data. To make this as accessible as possible, for the outsider, a service must appear to be an HTTP server speaking JSON:
 
-```shell
+{% highlight shell %}
 $ curl http://127.0.0.1:8081/sayHello -d '{
     "name": "John"
 }'
 $ {"says": "Hello, John"}
-```
+{% endhighlight %}
 
 There is no probably no language or environment used by modern application developers which has no support for HTTP and JSON.
 
@@ -35,11 +35,11 @@ There is no probably no language or environment used by modern application devel
 As a start, no code generation will be introduced in this design to keep matters simple.
 Service calls can happen with a single line of code:
 
-```js
+{% highlight javascript %}
 var rsp = call("serviceName.EndpointName", {
     "sayHello": "John"
 });
-``` 
+{% endhighlight %}
 
 This poses a problem in typed languages: every service call becomes type unsafe - we do not now wether the service, or the endpoint exists, or what is the structure of input and output arguments. This will be addressed later.
 
@@ -52,7 +52,7 @@ Here is how it works:
 
 There is an endpoint for registering a service instance under a certain name (assuming 127.0.0.1:8082 is the address of such a bookkeeping service running):
 
-```shell
+{% highlight shell %}
 curl http://127.0.0.1:8082/connect -d '{
     "address": "127.0.0.1:8081",
     "serviceName": "helloSayer",
@@ -64,26 +64,26 @@ curl http://127.0.0.1:8082/connect -d '{
         }
     }
 }'
-```
+{% endhighlight %}
 
 After this point, anyone who CURLs this service like this:
 
-```
+{% highlight shell %}
 curl http://127.0.0.1:8082/helloSayer/sayHello -d '{
     "name": "John"
 }'
-```
+{% endhighlight %}
 
 Will be proxied to our 'helloSayer' service. When service A calls service B, our communication will look like the following:
 
-```
+{% highlight javascript %}
  ___________              ____________              ___________
 |           |  Request   |            |  Request   |           |
 |           | ---------> |            | ---------> |           |
 | Service A |  Response  | Bookkeeper |  Reponse   | Service B |
 |           | <--------- |            | <--------- |           |
 |___________|            |____________|            |___________|
-```
+{% endhighlight %}
 
 As it can be seen, the bookeeper also serves as a proxy. Since all communications go trough this service, it can also act as a load balancer, it could analyze response times, smart route requests accordingly, and could provide monitoring information about the services on the network.
 
