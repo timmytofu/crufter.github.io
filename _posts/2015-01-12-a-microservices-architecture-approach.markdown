@@ -90,8 +90,55 @@ As it can be seen, the bookeeper also serves as a proxy. Since all communication
 
 ### Services as interfaces - a protocol
 
-The number of microservices can get rather large - to efficiently manage a large sized cluster we can not afford services to be special snowflakes - they must be as alike as possible. 
+The number of microservices can get rather large - to efficiently manage a large sized cluster we can not afford services to be special snowflakes - they must be as alike as possible. There is no point in having ReadById or similar endpoints having different naming conventions. Apart from the obvious ones like that, we can use this concept to take things one step further...
 
-#### Making services even smaller
+#### Reading data from multiple services
+
+A good (although somewhat controversial) candidate for service interfaces would be the way we access data from services. Boring CRUD-like data listing endpoints could entirely automated away by a system which reads all data from all services and provides ways to query that data. The only requirement for this is to have a way to easily copy the data set stored in services and to keep the replica in sync with the original.
+
+A solution to this would be to have an 'ListByUpdateDesc' or similar interface, which would be implemented by a service by listing every stored entity by last update(/create) time in a reverse chronological order:
+
+{% highlight bash %}
+$ curl http://customers-service.myservices.com/customers/listByUpdateDesc -d '{
+    "fromTime": "2015 01 27 18:23:55",
+    "limit":    5
+}'
+$ {
+    "customers": [
+        {
+            "id":           "100",
+            "name":         "Joe",
+            "favFruit":     "apple",
+            "lastUpdated":  "2015 01 27 18:23:59"
+        },
+        {
+            "id":           "28",
+            "name":         "Jane",
+            "favFruit":     "banana",
+            "lastUpdated":  "2015 01 27 18:23:57"
+        },
+        {
+            "id":           "182",
+            "name":         "Jill",
+            "favFruit":     "blueberry",
+            "lastUpdated":  "2015 01 27 18:23:57"
+        },
+        {
+            "id":           "41",
+            "name":         "Jacob",
+            "favFruit":     "apple",
+            "lastUpdated":  "2015 01 27 18:23:57"
+        },
+        {
+            "id":           "55",
+            "name":         "John",
+            "favFruit":     "peach",
+            "lastUpdated":  "2015 01 27 18:23:55"
+        },
+    ]
+}
+{% endhighlight %}
+
+### Making services even smaller
 
 To be continued.
