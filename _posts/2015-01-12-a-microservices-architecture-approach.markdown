@@ -47,7 +47,7 @@ This poses a problem in typed languages: every service call becomes type unsafe 
 
 Looking at the previous code snippets, we can see that the shell CURL talked to a specific HTTP server, while the JavaScript snippet referred to a service by name. A bookeeping entity, which maps service names to service instances must be introduced.
 
-There is a working prototype of such a entity in a form of a service [here](github.com/crufter/orc).
+There is a working prototype of such a entity in a form of a service [here](https://github.com/crufter/orc).
 Here is how it works:
 
 There is an endpoint for registering a service instance under a certain name (assuming 127.0.0.1:8082 is the address of such a bookkeeping service running):
