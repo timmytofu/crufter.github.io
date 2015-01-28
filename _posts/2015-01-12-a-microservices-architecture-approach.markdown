@@ -21,7 +21,7 @@ In the following a design from simpler to more complex will be explained
 
 A service for the service caller does not have to be more than a collection of functions accepting and returning some data. To make this as accessible as possible, for the outsider, a service must appear to be an HTTP server speaking JSON:
 
-{% highlight shell %}
+{% highlight bash %}
 $ curl http://127.0.0.1:8081/sayHello -d '{
     "name": "John"
 }'
@@ -52,7 +52,7 @@ Here is how it works:
 
 There is an endpoint for registering a service instance under a certain name (assuming 127.0.0.1:8082 is the address of such a bookkeeping service running):
 
-{% highlight shell %}
+{% highlight bash %}
 curl http://127.0.0.1:8082/connect -d '{
     "address": "127.0.0.1:8081",
     "serviceName": "helloSayer",
@@ -68,7 +68,7 @@ curl http://127.0.0.1:8082/connect -d '{
 
 After this point, anyone who CURLs this service like this:
 
-{% highlight shell %}
+{% highlight bash %}
 curl http://127.0.0.1:8082/helloSayer/sayHello -d '{
     "name": "John"
 }'
