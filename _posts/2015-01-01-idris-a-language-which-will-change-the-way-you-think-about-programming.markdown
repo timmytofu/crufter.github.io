@@ -1,23 +1,21 @@
 ---
 layout: post
-title:  "Meet Idris, a language which will change the way you think about programming"
+title:  "Meet Idris, a language that will change the way you think about programming"
 date:   2015-01-01
 ---
-
-<b>This article is under development.</b>
 
 Most programming languages barely differ from each other apart from superficial syntax differences, but not Idris. Idris, having a type system supporting dependent types and other innovative ideas, opens up a host of possibilities few other language provides.
 
 When we want to ensure that a piece of code works as intended the usual tool we use is testing. Testing provides plenty of benefits, but wouldn't you prefer to encode your tests right in the type signature and let the compiler decide if your code is correct given those constraints? With Idris you can do exactly that.
 
-Let's investigate how by comparing a very simple list operation, append, also called (++) in the two languages. Append in Haskell has the following type signature:
+Let's investigate how by comparing a very simple list operation, append, also called (++) in Haskell and Idris. Append in Haskell has the following type signature:
 
 {% highlight haskell %}
 Prelude> :t (++)
 (++) :: [a] -> [a] -> [a]
 {% endhighlight %}
 
-Sharing most of the syntax and some of the type system with Haskell, the append for lists looks very similar in Idris:
+Sharing most of the syntax and lot of the type system with Haskell, the append for lists looks very similar in Idris:
 
 {% highlight haskell %}
 Idris> :t (++)
@@ -93,9 +91,13 @@ This compiling program almost works perfectly but it does have a quirk; the firs
 
 So we have proved that whatever is stated in the type signature is guaranteed to be correct - but nothing else may be. In our append example we state that 'given vector a and vector b, calling append with those vectors as arguments will yield a vector with a length of length a + length b'. It does not state that the resulting vector will contain any element from the argument vectors, or if the order is preserved or anything else! But this is pretty obvious since how could the compiler decide wether a code is correct or not if we do not tell it the criteria to judge a piece of code by. Mind reading based programming is not invented yet, unfortunately.
 
+To say the least, dependent types have the potential to become a new useful tool in a programmer's toolbox - and there is a certain idealistic beauty in building on top of formally verified, guaranteed to be correct code.
+
 Idris version used to compile code snippet(s):
 
 {% highlight haskell %}
 $ idris -v
 0.9.14.2-git:45de9ab
 {% endhighlight %}
+
+
