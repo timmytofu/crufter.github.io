@@ -73,7 +73,7 @@ When elaborating argument xs to constructor Prelude.Vect.:::
 Metavariables: Main.vapp
 {% endhighlight %}
 
-The above example shows an interesting quality of Idris' type system: the correctness of the code is checked against any specification in the functions' type. If the implementation does meet the specification a compile error is triggered. Naturally, any property not described by those specifications will not interest the compiler. Let's say we implement our 'vapp' function the following way:
+The above example shows an interesting quality of Idris' type system: the correctness of the code is checked against any specification in the functions' type. If the implementation does not meet the specification a compile error is triggered. Naturally, any property not described by those specifications will not interest the compiler. Let's say we implement our 'vapp' function the following way:
 
 {% highlight haskell %}
 vapp1 : Vect n a -> Vect m a -> Vect (n + m) a
